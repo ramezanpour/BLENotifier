@@ -32,7 +32,7 @@ public class MainActivity extends AppCompatActivity {
     private Context context;
 
     BluetoothAdapter bluetoothAdapter;
-    private HashMap<String, ScanResult> mScanResults;
+    private HashMap<String, WScanResult> mScanResults;
     private BtleScanCallback mScanCallback;
     private BluetoothLeScanner mBluetoothLeScanner;
     private DeviceAdapter adapter;
@@ -46,7 +46,7 @@ public class MainActivity extends AppCompatActivity {
         context = getApplicationContext();
 
 
-        adapter = new DeviceAdapter(new ArrayList<ScanResult>(),context);
+        adapter = new DeviceAdapter(new ArrayList<WScanResult>(),context);
         LinearLayoutManager linearLayoutManager
                 = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
         RecyclerView recyclerView = findViewById(R.id.recycler);
@@ -104,7 +104,7 @@ public class MainActivity extends AppCompatActivity {
 
         List<ScanFilter> filters = new ArrayList<>();
         ScanSettings settings = new ScanSettings.Builder()
-                //.setScanMode(ScanSettings.SCAN_MODE_LOW_POWER)
+                .setScanMode(ScanSettings.SCAN_MODE_LOW_POWER)
                 .build();
 
 
@@ -114,17 +114,16 @@ public class MainActivity extends AppCompatActivity {
         mBluetoothLeScanner = bluetoothAdapter.getBluetoothLeScanner();
 
         ScanFilter scanFilterKontact = new ScanFilter.Builder()
-                .setServiceUuid(new ParcelUuid(Config.mUuidKontact)).build();
+                .setServiceUuid(new ParcelUuid(Config.mUuidIbeaconKontact)).build();
 
 
 
         ScanFilter scanFilterSensoro = new ScanFilter.Builder()
-                .setServiceUuid(new ParcelUuid(Config.mUuidSensoro)).build();
+                .setServiceUuid(new ParcelUuid(Config.mUuidIbeaconSensoro)).build();
 
 
-        filters.add(scanFilterKontact);
+        //filters.add(scanFilterKontact);
         //filters.add(scanFilterSensoro);
-        //filters.add(scanFilter2);
 
 
         mBluetoothLeScanner.startScan(filters, settings, mScanCallback);
@@ -149,11 +148,25 @@ public class MainActivity extends AppCompatActivity {
             Log.e("SCAN_FAILED", "BLE Scan Failed with code " + errorCode);
         }
         private void addScanResult(ScanResult result) {
-            BluetoothDevice device = result.getDevice();
-            String deviceAddress = device.getAddress();
-            mScanResults.put(deviceAddress, result);
-            List<ScanResult> list = new ArrayList<>(mScanResults.values());
-            adapter.updateData(list);
+
+            if (result.getScanRecord()!=null) {
+                WScanResult wScanResult = Converter.parseBeaconData(result.getScanRecord().getBytes(), result.getRssi(),result.getTimestampNanos(),result.getDevice().getAddress());
+                if (wScanResult!=null) {
+
+                    //checking the Sensoro ibeacon uuid
+                    String s2 = wScanResult.BSSID.split(",")[2];
+                    String s = s2.substring(0, s2.length() - 1);
+                    if (s.equals("23A01AF0-232A-4518-9C0E-323FB773F5EF")) {
+                        BluetoothDevice device = result.getDevice();
+                        String deviceAddress = device.getAddress();
+                        mScanResults.put(deviceAddress, wScanResult);
+                        List<WScanResult> list = new ArrayList<>(mScanResults.values());
+                        adapter.updateData(list);
+                    }
+                }
+            }
+
+
         }
     }
 
