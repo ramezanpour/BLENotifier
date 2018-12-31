@@ -39,6 +39,7 @@ public class DeviceAdapter  extends RecyclerView.Adapter<DeviceAdapter.ViewHolde
         WScanResult model = data.get(i);
         viewHolder.macAddress.setText(model.macAddress);
         viewHolder.rssi.setText(String.valueOf(model.level));
+        viewHolder.txpower.setText(String.valueOf(model.power));
         viewHolder.distance.setText(String.valueOf(model.distance));
         viewHolder.timeStampNano.setText(String.valueOf(String.valueOf(model.time)));
 

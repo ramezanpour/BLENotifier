@@ -148,11 +148,9 @@ public class MainActivity extends AppCompatActivity {
             Log.e("SCAN_FAILED", "BLE Scan Failed with code " + errorCode);
         }
         private void addScanResult(ScanResult result) {
-
             if (result.getScanRecord()!=null) {
                 WScanResult wScanResult = Converter.parseBeaconData(result.getScanRecord().getBytes(), result.getRssi(),result.getTimestampNanos(),result.getDevice().getAddress());
                 if (wScanResult!=null) {
-
                     //checking the Sensoro ibeacon uuid
                     String s2 = wScanResult.BSSID.split(",")[2];
                     String s = s2.substring(0, s2.length() - 1);
@@ -165,8 +163,6 @@ public class MainActivity extends AppCompatActivity {
                     }
                 }
             }
-
-
         }
     }
 

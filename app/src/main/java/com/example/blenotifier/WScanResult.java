@@ -5,8 +5,8 @@ public class WScanResult implements Comparable<WScanResult> {
     public String SSID = "";
     public String BSSID = "";
     public int type = 0;
-    public int level = 0;
-    public int power = 0;
+    public int level = 0; //this is the rssi which is sent by beacon
+    public int power = 0; // this is the mRssi seetiing or txpower level which  has been set for the beacon
     public int battery = 0;
     public int frequency = 0;
     public float distance = 0.0F;
