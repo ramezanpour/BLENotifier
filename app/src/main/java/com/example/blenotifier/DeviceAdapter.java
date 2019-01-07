@@ -42,8 +42,12 @@ public class DeviceAdapter  extends RecyclerView.Adapter<DeviceAdapter.ViewHolde
         viewHolder.txpower.setText(String.valueOf(model.power));
         viewHolder.distance.setText(String.valueOf(model.distance));
         viewHolder.timeStampNano.setText(String.valueOf(String.valueOf(model.time)));
-
-        //TODO: major minor and txPower is remained
+        String major = model.BSSID.split(",")[0];
+        major = major.substring(1, major.length());
+        String minor = model.BSSID.split(",")[1];
+        viewHolder.major.setText(major);
+        viewHolder.minor.setText(minor);
+        //TODO: txPower is remained
     }
 
     public void updateData(List<WScanResult> updatedData){
