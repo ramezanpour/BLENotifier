@@ -13,6 +13,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.ParcelUuid;
+import android.os.SystemClock;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
@@ -33,6 +34,8 @@ public class MainActivity extends AppCompatActivity {
 
     BluetoothAdapter bluetoothAdapter;
     private HashMap<String, WScanResult> mScanResults;
+    private List<WScanResult> lastResult = new ArrayList<>();
+    private long lastResultTimeCheck = 0;
     private BtleScanCallback mScanCallback;
     private BluetoothLeScanner mBluetoothLeScanner;
     private DeviceAdapter adapter;
@@ -160,10 +163,24 @@ public class MainActivity extends AppCompatActivity {
                         mScanResults.put(deviceAddress, wScanResult);
                         List<WScanResult> list = new ArrayList<>(mScanResults.values());
                         adapter.updateData(list);
+
+                        //add last result to list
+                        addLatestWscanResult(list);
                     }
                 }
             }
         }
+    }
+
+    private void addLatestWscanResult(List<WScanResult> list) {
+        if (SystemClock.elapsedRealtime() - lastResultTimeCheck > 3000){
+            //here we have the latest three seconds WScanResult
+            Log.d("list_of_latest_result",lastResult.toString());
+            lastResult.clear();
+        }
+        lastResultTimeCheck = SystemClock.elapsedRealtime();
+        lastResult.addAll(list);
+
     }
 
 }
