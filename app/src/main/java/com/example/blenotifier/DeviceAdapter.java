@@ -10,6 +10,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowContentFrameStats;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -18,10 +19,10 @@ import java.util.UUID;
 
 public class DeviceAdapter  extends RecyclerView.Adapter<DeviceAdapter.ViewHolder>{
 
-    private List<ScanResult> data;
+    private List<WScanResult> data;
     private Context context;
 
-    public DeviceAdapter(List<ScanResult> data, Context context) {
+    public DeviceAdapter(List<WScanResult> data, Context context) {
         this.data = data;
         this.context = context;
     }
@@ -35,37 +36,27 @@ public class DeviceAdapter  extends RecyclerView.Adapter<DeviceAdapter.ViewHolde
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder viewHolder, int i) {
-        ScanResult model = data.get(i);
-
-        viewHolder.macAdress.setText(model.getDevice().getAddress());
-        viewHolder.rssi.setText(String.valueOf(model.getRssi()));
-        if (model.getScanRecord()!=null) {
-
-            int txPowerInt = model.getScanRecord().getTxPowerLevel();
-            viewHolder.txpower.setText(String.valueOf(txPowerInt));
-            if (txPowerInt == -12 || txPowerInt == -16 || txPowerInt == -20)
-                viewHolder.row.setBackgroundColor(Color.parseColor("#ff0000"));
-            else
-                viewHolder.row.setBackgroundColor(Color.WHITE);
-
-           // model.getScanRecord().getServiceUuids().get(0)
-        }
-        viewHolder.serviceName.setText(model.getDevice().getName());
-        viewHolder.timeStampNano.setText(String.valueOf(model.getTimestampNanos()));
-
-
-
-
-
+        WScanResult model = data.get(i);
+        viewHolder.macAddress.setText(model.macAddress);
+        viewHolder.rssi.setText(String.valueOf(model.level));
+        viewHolder.txpower.setText(String.valueOf(model.power));
+        viewHolder.distance.setText(String.valueOf(model.distance));
+        viewHolder.timeStampNano.setText(String.valueOf(String.valueOf(model.time)));
+        String major = model.BSSID.split(",")[0];
+        major = major.substring(1, major.length());
+        String minor = model.BSSID.split(",")[1];
+        viewHolder.major.setText(major);
+        viewHolder.minor.setText(minor);
+        //TODO: txPower is remained
     }
 
-    public void updateData(List<ScanResult> updatedData){
+    public void updateData(List<WScanResult> updatedData){
         data.clear();
         data.addAll(updatedData);
         notifyDataSetChanged();
     }
 
-    public void addOneData(ScanResult result){
+    public void addOneData(WScanResult result){
         data.add(result);
         notifyDataSetChanged();
     }
@@ -76,21 +67,25 @@ public class DeviceAdapter  extends RecyclerView.Adapter<DeviceAdapter.ViewHolde
     }
 
     class ViewHolder extends RecyclerView.ViewHolder {
-        private TextView macAdress;
+        private TextView macAddress;
         private TextView rssi;
         private TextView txpower;
+        private TextView major;
+        private TextView minor;
+        private TextView distance;
         private TextView timeStampNano;
-        private TextView serviceName;
         private LinearLayout row;
 
         private ViewHolder(@NonNull View itemView) {
             super(itemView);
 
-            macAdress = itemView.findViewById(R.id.macAdress);
+            macAddress = itemView.findViewById(R.id.macAddress);
             rssi = itemView.findViewById(R.id.rssi);
             txpower = itemView.findViewById(R.id.txPower);
             timeStampNano = itemView.findViewById(R.id.timeStampNano);
-            serviceName = itemView.findViewById(R.id.serviceName);
+            major = itemView.findViewById(R.id.major);
+            minor = itemView.findViewById(R.id.minor);
+            distance = itemView.findViewById(R.id.distance);
             row = itemView.findViewById(R.id.row);
         }
     }
